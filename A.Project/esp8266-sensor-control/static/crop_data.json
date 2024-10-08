@@ -1,0 +1,35 @@
+{
+  "rice": {
+    "name": "Rice",
+    "image": "/static/images/rice.jpg",
+    "description": "Rice is the seed of the grass species Oryza sativa or less commonly Oryza glaberrima.",
+    "regions": "Tamil Nadu, Kerala, Karnataka",
+    "expectedYield": "2.5 Tons / Acre",
+    "duration": "90-150 days",
+    "nutrients": "~25%",
+    "weather": "Sunny",
+    "etRate": "0.85"
+  },
+  "wheat": {
+    "name": "Wheat",
+    "image": "/static/images/wheat.jpg",
+    "description": "Wheat is a grass widely cultivated for its seed, a cereal grain which is a worldwide staple food.",
+    "regions": "Punjab, Haryana, Uttar Pradesh",
+    "expectedYield": "1.5 Tons / Acre",
+    "duration": "100-150 days",
+    "nutrients": "~20%",
+    "weather": "Cool",
+    "etRate": "0.75"
+  },
+  "maize": {
+    "name": "Maize",
+    "image": "/static/images/maize.jpg",
+    "description": "Maize, also known as corn, is a cereal grain first domesticated by indigenous peoples in southern Mexico.",
+    "regions": "Karnataka, Andhra Pradesh, Maharashtra",
+    "expectedYield": "2.0 Tons / Acre",
+    "duration": "60-100 days",
+    "nutrients": "~22%",
+    "weather": "Warm",
+    "etRate": "0.80"
+  }
+}

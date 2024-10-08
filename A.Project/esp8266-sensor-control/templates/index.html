@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NanoGrow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body class="d-flex flex-column h-100">
+    <div class="top-bar">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <h2 class="mb-0 nanogrow-title">NanoGrow</h2>
+                </div>
+                <div class="col-md-9">
+                    <div class="d-flex justify-content-end">
+                        <div class="weather-info me-4">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="location">Loading location...</span>
+                        </div>
+                        <div class="weather-info me-4">
+                            <i class="fas fa-thermometer-half"></i>
+                            <span id="tempHumidity">Loading weather...</span>
+                        </div>
+                        <div class="weather-info">
+                            <i class="fas fa-cloud-rain"></i>
+                            <span id="rainCloud">Loading precipitation...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid flex-grow-1 d-flex flex-column">
+        <div class="row flex-grow-1">
+            <div class="col-md-6">
+                <div class="crop-info-card">
+                    <div class="crop-image-container">
+                        <img id="cropImage" src="/static/images/default-crop.jpg" alt="Crop Image" class="crop-image">
+                    </div>
+                    <h2 id="cropName" class="crop-name">Select a Crop</h2>
+                    <p id="cropDescription" class="crop-description">Select a crop type to see its description.</p>
+                    <div class="crop-details">
+                        <div class="detail-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="cropRegions">Regions: -</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-balance-scale"></i>
+                            <span id="cropYield">Expected Yield: -</span>
+                        </div>
+                    </div>
+                    <div class="crop-icons">
+                        <div class="icon-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Duration</span>
+                            <strong id="cropDuration">-</strong>
+                        </div>
+                        <div class="icon-item">
+                            <i class="fas fa-leaf"></i>
+                            <span>Nutrients</span>
+                            <strong id="cropNutrients">-</strong>
+                        </div>
+                        <div class="icon-item">
+                            <i class="fas fa-cloud-sun"></i>
+                            <span>Weather</span>
+                            <strong id="cropWeather">-</strong>
+                        </div>
+                        <div class="icon-item">
+                            <i class="fas fa-tint"></i>
+                            <span>ET Rate</span>
+                            <strong id="cropETRate">-</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 d-flex flex-column">
+                <div class="content flex-grow-1">
+                    <div class="mb-4">
+                        <label for="cropType" class="form-label">Crop Type <span class="text-danger">*</span></label>
+                        <select class="form-select modern-select" id="cropType" required>
+                            <option value="" selected disabled>Select Crop Type</option>
+                            <option value="rice">Rice</option>
+                            <option value="maize">Maize</option>
+                            <option value="chickpea">Chickpea</option>
+                            <option value="kidneybeans">Kidney Beans</option>
+                            <option value="pigeonpeas">Pigeon Peas</option>
+                            <option value="mothbeans">Moth Beans</option>
+                            <option value="mungbean">Mung Bean</option>
+                            <option value="blackgram">Black Gram</option>
+                            <option value="lentil">Lentil</option>
+                            <option value="pomegranate">Pomegranate</option>
+                            <option value="banana">Banana</option>
+                            <option value="mango">Mango</option>
+                            <option value="grapes">Grapes</option>
+                            <option value="watermelon">Watermelon</option>
+                            <option value="muskmelon">Muskmelon</option>
+                            <option value="apple">Apple</option>
+                            <option value="orange">Orange</option>
+                            <option value="papaya">Papaya</option>
+                            <option value="coconut">Coconut</option>
+                            <option value="cotton">Cotton</option>
+                            <option value="jute">Jute</option>
+                            <option value="coffee">Coffee</option>
+                        </select>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label for="nitrogen" class="form-label">Nitrogen (N) % <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control modern-input" id="nitrogen" placeholder="Enter N Value" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="phosphorus" class="form-label">Phosphorus (P) % <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control modern-input" id="phosphorus" placeholder="Enter P Value" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="potassium" class="form-label">Potassium (K) % <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control modern-input" id="potassium" placeholder="Enter K Value" required>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="soilType" class="form-label">Soil Type <span class="text-danger">*</span></label>
+                            <select class="form-select modern-select" id="soilType" required>
+                                <option value="" selected disabled>Select Soil Type</option>
+                                <option value="alluvial">Alluvial Soil</option>
+                                <option value="black">Black Soil</option>
+                                <option value="red">Red Soil</option>
+                                <option value="laterite">Laterite Soil</option>
+                                <option value="sandy">Sandy Soil</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="ph" class="form-label">pH <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control modern-input" id="ph" placeholder="Enter pH Value" step="0.1" min="0" max="14" required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="soilMoisture" class="form-label">Soil Moisture</label>
+                        <div class="soil-moisture-info">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h3 class="moisture-value mb-0"><span id="soilMoistureValue">0</span>%</h3>
+                                <span id="moistureStatus" class="moisture-status"></span>
+                            </div>
+                            <div class="progress modern-progress mb-2">
+                                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="moisture-details">
+                                <code>Measured: <span id="measuredMoisture">0</span>% | Predicted Optimal: <span id="predictedOptimalHumidity">0</span>% | Adjusted: <span id="adjustedMoisture">0</span>%</code>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="lastMeasurementTime" class="form-label">Last Measurement Time</label>
+                        <input type="text" class="form-control modern-input" id="lastMeasurementTime" readonly>
+                    </div>
+                    <button id="measureBtn" class="btn btn-primary btn-lg w-100">Measure</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let locationData = null;
+        let weatherData = null;
+        const apiKey = '0c6b2ec1d20b3e79264baa31610806e2';
+
+        async function getLocation() {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                locationData = {
+                    latitude: data.latitude,
+                    longitude: data.longitude,
+                    city: data.city,
+                    region: data.region,
+                    country: data.country_name
+                };
+                console.log('Location data:', locationData);
+                await getWeather();
+            } catch (error) {
+                console.error('Error fetching location:', error);
+            }
+        }
+
+        async function getWeather() {
+            if (locationData) {
+                const url = `https://api.openweathermap.org/data/2.5/weather?lat=${locationData.latitude}&lon=${locationData.longitude}&appid=${apiKey}&units=metric`;
+                try {
+                    const response = await fetch(url);
+                    weatherData = await response.json();
+                    console.log('Weather data:', weatherData);
+                    updateWeatherDisplay();
+                } catch (error) {
+                    console.error('Error fetching weather:', error);
+                }
+            }
+        }
+
+        function updateWeatherDisplay() {
+            if (weatherData && locationData) {
+                const temperature = weatherData.main.temp.toFixed(1);
+                const humidity = weatherData.main.humidity;
+                const rainfall = weatherData.rain ? (weatherData.rain['1h'] || 0).toFixed(1) : '0.0';
+                const cloudiness = weatherData.clouds.all;
+                
+                document.getElementById('location').textContent = `${locationData.city}`;
+                document.getElementById('tempHumidity').textContent = `${temperature}°C, ${humidity}% Humidity`;
+                document.getElementById('rainCloud').textContent = `${rainfall} mm/h, ${cloudiness}% Cloud`;
+            }
+        }
+
+        function collectFormData() {
+            const cropType = document.getElementById('cropType').value;
+            const nitrogen = document.getElementById('nitrogen').value;
+            const phosphorus = document.getElementById('phosphorus').value;
+            const potassium = document.getElementById('potassium').value;
+            const soilType = document.getElementById('soilType').value;
+            const ph = document.getElementById('ph').value;
+            const temperature = weatherData ? weatherData.main.temp : null;
+
+            return {
+                cropType: cropType,
+                nitrogen: parseFloat(nitrogen),
+                phosphorus: parseFloat(phosphorus),
+                potassium: parseFloat(potassium),
+                soilType: soilType,
+                ph: parseFloat(ph),
+                temperature: temperature
+            };
+        }
+
+        function updateIrrigationTime(time) {
+            const irrigationTimeElement = document.getElementById('lastMeasurementTime');
+            if (irrigationTimeElement) {
+                irrigationTimeElement.value = time;
+            } else {
+                console.error('Irrigation time element not found');
+            }
+        }
+
+        function updateMoistureDisplay(data) {
+            if (data && typeof data === 'object') {
+                const soilMoistureValue = document.getElementById('soilMoistureValue');
+                const moistureStatus = document.getElementById('moistureStatus');
+                const progressBar = document.querySelector('.progress-bar');
+                const measuredMoisture = document.getElementById('measuredMoisture');
+                const predictedOptimalHumidity = document.getElementById('predictedOptimalHumidity');
+                const adjustedMoisture = document.getElementById('adjustedMoisture');
+
+                if (soilMoistureValue) soilMoistureValue.textContent = data.adjusted_moisture ? data.adjusted_moisture.toFixed(1) : 'N/A';
+                if (moistureStatus) moistureStatus.textContent = data.moisture_status || 'Unknown';
+                if (progressBar) {
+                    progressBar.style.width = `${data.adjusted_moisture || 0}%`;
+                    progressBar.setAttribute('aria-valuenow', data.adjusted_moisture || 0);
+                }
+                if (measuredMoisture) measuredMoisture.textContent = data.measured_moisture ? data.measured_moisture.toFixed(1) : 'N/A';
+                if (predictedOptimalHumidity) predictedOptimalHumidity.textContent = data.predicted_optimal_humidity ? data.predicted_optimal_humidity.toFixed(1) : 'N/A';
+                if (adjustedMoisture) adjustedMoisture.textContent = data.adjusted_moisture ? data.adjusted_moisture.toFixed(1) : 'N/A';
+            } else {
+                console.error('Invalid data received for moisture display update');
+            }
+        }
+
+        document.getElementById('measureBtn').addEventListener('click', function() {
+            // ... existing code ...
+
+            fetch('/api/process_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received data:', data);
+                if (data.status === 'success' && data.processed_data) {
+                    updateMoistureDisplay(data.processed_data);
+                    updateIrrigationTime(new Date().toLocaleString());
+                } else {
+                    console.error('Unexpected data structure:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        // Update irrigation time display
+        function updateIrrigationTime(time) {
+            const [date, timeValue] = time.split(' ');
+            document.getElementById('irrigationDate').value = date;
+            document.getElementById('irrigationTime').value = timeValue;
+        }
+
+        // Get location and weather when the page loads
+        window.addEventListener('load', getLocation);
+
+        // Set a placeholder irrigation time (replace with actual logic later)
+        updateIrrigationTime('2023-05-01 09:00 AM');
+
+        let cropData = null;
+
+        async function loadCropData() {
+            try {
+                const response = await fetch('/static/crop_data.json');
+                cropData = await response.json();
+                console.log('Crop data loaded:', cropData);
+            } catch (error) {
+                console.error('Error loading crop data:', error);
+            }
+        }
+
+        function displayCropInfo(cropType) {
+            const cropInfo = document.getElementById('cropInfo');
+            if (cropData && cropData[cropType]) {
+                const crop = cropData[cropType];
+                cropInfo.innerHTML = `
+                    <h4>${crop.name}</h4>
+                    <img src="${crop.image}" alt="${crop.name}" style="max-width: 100%; height: auto;">
+                    <p>${crop.description}</p>
+                    <p><strong>Duration:</strong> ${crop.duration}</p>
+                    <p><strong>Nutrition Requirements:</strong></p>
+                    <ul>
+                        <li>Nitrogen: ${crop.nutrition.nitrogen}</li>
+                        <li>Phosphorus: ${crop.nutrition.phosphorus}</li>
+                        <li>Potassium: ${crop.nutrition.potassium}</li>
+                    </ul>
+                    <p><strong>Harvest Period:</strong> ${crop.harvestPeriod}</p>
+                    <p><strong>Recommended Weather:</strong> ${crop.recommendedWeather}</p>
+                `;
+            } else {
+                cropInfo.innerHTML = '<p>Select a crop type to view information.</p>';
+            }
+        }
+
+        document.getElementById('cropType').addEventListener('change', (event) => {
+            displayCropInfo(event.target.value);
+        });
+
+        window.addEventListener('load', loadCropData);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const cropSelect = document.getElementById('cropType');
+            if (cropSelect) {
+                console.log('Crop select element found');
+                cropSelect.addEventListener('change', function() {
+                    const selectedCrop = this.value;
+                    console.log('Selected crop:', selectedCrop);
+                    
+                    fetch('/static/crop_data.json')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Crop data loaded:', data);
+                            const cropData = data[selectedCrop];
+                            if (cropData) {
+                                console.log('Updating UI with:', cropData);
+                                updateCropInfo(cropData);
+                            } else {
+                                console.error('No data found for crop:', selectedCrop);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error loading or processing crop data:', error);
+                        });
+                });
+            } else {
+                console.error('Crop select element not found');
+            }
+        });
+
+        function updateCropInfo(cropData) {
+            try {
+                const cropImage = document.getElementById('cropImage');
+                if (cropImage) {
+                    cropImage.src = cropData.image;
+                    cropImage.onerror = function() {
+                        console.warn('Failed to load crop image, using default');
+                        this.src = '/static/images/default-crop.jpg';
+                    };
+                } else {
+                    console.error('Crop image element not found');
+                }
+                
+                updateElementText('cropName', cropData.name);
+                updateElementText('cropDescription', cropData.description);
+                updateElementText('cropRegions', `Regions: ${cropData.regions}`);
+                updateElementText('cropYield', `Expected Yield: ${cropData.expectedYield}`);
+                updateElementText('cropDuration', cropData.duration);
+                updateElementText('cropNutrients', cropData.nutrients);
+                updateElementText('cropWeather', cropData.weather);
+                updateElementText('cropETRate', cropData.etRate);
+                
+                console.log('Crop info updated successfully');
+            } catch (error) {
+                console.error('Error updating crop info:', error);
+            }
+        }
+
+        function updateElementText(elementId, text) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = text;
+            } else {
+                console.error(`Element not found: ${elementId}`);
+            }
+        }
+
+        document.getElementById('measureBtn').addEventListener('click', function() {
+            const now = new Date();
+            const formattedTime = now.toLocaleString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            document.getElementById('lastMeasurementTime').value = formattedTime;
+            
+            // Your existing measurement code here
+        });
+
+        // Test function to check if JavaScript is running
+        console.log('Crop info script loaded');
+    </script>
+</body>
+</html>
