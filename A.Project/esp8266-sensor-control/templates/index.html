@@ -54,6 +54,10 @@
                             <i class="fas fa-balance-scale"></i>
                             <span id="cropYield">Expected Yield: -</span>
                         </div>
+                        <div class="detail-item">
+                            <i class="fas fa-flask"></i>
+                            <span id="cropNPK">Optimal N-P-K: -</span>
+                        </div>
                     </div>
                     <div class="crop-icons">
                         <div class="icon-item">
@@ -142,12 +146,12 @@
                     </div>
                     <div class="mb-4">
                         <label for="soilMoisture" class="form-label">Soil Moisture</label>
-                        <div class="soil-moisture-info">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="soil-moisture-info p-3 rounded">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h3 class="moisture-value mb-0"><span id="soilMoistureValue">0</span>%</h3>
                                 <span id="moistureStatus" class="moisture-status"></span>
                             </div>
-                            <div class="progress modern-progress mb-2">
+                            <div class="progress modern-progress mb-3">
                                 <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                             <div class="moisture-details">
@@ -237,46 +241,103 @@
         }
 
         function updateIrrigationTime(time) {
-            const irrigationTimeElement = document.getElementById('lastMeasurementTime');
-            if (irrigationTimeElement) {
-                irrigationTimeElement.value = time;
+            const lastMeasurementTimeElement = document.getElementById('lastMeasurementTime');
+            if (lastMeasurementTimeElement) {
+                lastMeasurementTimeElement.value = time;
             } else {
-                console.error('Irrigation time element not found');
+                console.error('Last measurement time element not found');
             }
         }
 
         function updateMoistureDisplay(data) {
-            if (data && typeof data === 'object') {
-                const soilMoistureValue = document.getElementById('soilMoistureValue');
-                const moistureStatus = document.getElementById('moistureStatus');
-                const progressBar = document.querySelector('.progress-bar');
-                const measuredMoisture = document.getElementById('measuredMoisture');
-                const predictedOptimalHumidity = document.getElementById('predictedOptimalHumidity');
-                const adjustedMoisture = document.getElementById('adjustedMoisture');
+            const soilMoistureValue = document.getElementById('soilMoistureValue');
+            const moistureStatus = document.getElementById('moistureStatus');
+            const progressBar = document.querySelector('.progress-bar');
+            const measuredMoisture = document.getElementById('measuredMoisture');
+            const predictedOptimalHumidity = document.getElementById('predictedOptimalHumidity');
+            const adjustedMoisture = document.getElementById('adjustedMoisture');
 
-                if (soilMoistureValue) soilMoistureValue.textContent = data.adjusted_moisture ? data.adjusted_moisture.toFixed(1) : 'N/A';
-                if (moistureStatus) moistureStatus.textContent = data.moisture_status || 'Unknown';
-                if (progressBar) {
-                    progressBar.style.width = `${data.adjusted_moisture || 0}%`;
-                    progressBar.setAttribute('aria-valuenow', data.adjusted_moisture || 0);
-                }
-                if (measuredMoisture) measuredMoisture.textContent = data.measured_moisture ? data.measured_moisture.toFixed(1) : 'N/A';
-                if (predictedOptimalHumidity) predictedOptimalHumidity.textContent = data.predicted_optimal_humidity ? data.predicted_optimal_humidity.toFixed(1) : 'N/A';
-                if (adjustedMoisture) adjustedMoisture.textContent = data.adjusted_moisture ? data.adjusted_moisture.toFixed(1) : 'N/A';
-            } else {
-                console.error('Invalid data received for moisture display update');
+            // Use default values if data is not provided
+            const defaultData = {
+                measured_moisture: 50,
+                predicted_optimal_humidity: 60,
+                adjusted_moisture: 52
+            };
+
+            data = data || defaultData;
+
+            // Scale the predicted optimal humidity to 0-80%
+            const scaledPredictedHumidity = (data.predicted_optimal_humidity * 0.8).toFixed(1);
+            
+            // Scale the measured moisture to the same range for comparison
+            const scaledMeasuredMoisture = (data.measured_moisture * 0.8).toFixed(1);
+
+            if (soilMoistureValue) soilMoistureValue.textContent = scaledMeasuredMoisture;
+            if (moistureStatus) {
+                const status = getMoistureStatus(parseFloat(scaledMeasuredMoisture), parseFloat(scaledPredictedHumidity));
+                moistureStatus.textContent = status.text;
+                moistureStatus.className = `moisture-status ${status.class}`;
             }
+            if (progressBar) {
+                progressBar.style.width = `${scaledMeasuredMoisture}%`;
+                progressBar.setAttribute('aria-valuenow', scaledMeasuredMoisture);
+            }
+            if (measuredMoisture) measuredMoisture.textContent = scaledMeasuredMoisture;
+            if (predictedOptimalHumidity) predictedOptimalHumidity.textContent = scaledPredictedHumidity;
+            if (adjustedMoisture) adjustedMoisture.textContent = data.adjusted_moisture.toFixed(1);
+        }
+
+        function initializeMoistureDisplay() {
+            updateMoistureDisplay(); // This will use the default values
+        }
+
+        function getMoistureStatus(measured, predicted) {
+            const diff = measured - predicted;
+            if (diff < -15) return { text: 'Severely Under-irrigated', class: 'bg-danger' };
+            if (diff < -5) return { text: 'Under-irrigated', class: 'bg-warning' };
+            if (diff > 15) return { text: 'Severely Over-irrigated', class: 'bg-primary' };
+            if (diff > 5) return { text: 'Over-irrigated', class: 'bg-info' };
+            return { text: 'Optimal', class: 'bg-success' };
         }
 
         document.getElementById('measureBtn').addEventListener('click', function() {
-            // ... existing code ...
+            const formData = collectFormData();
+            
+            // Update last measurement time
+            const now = new Date();
+            const formattedTime = now.toLocaleString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            updateIrrigationTime(formattedTime);
 
-            fetch('/api/process_data', {
+            // First, publish the measure command
+            fetch('/api/publish_measure', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Measure command published successfully');
+                    
+                    // Now process the data
+                    return fetch('/api/process_data', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                } else {
+                    throw new Error('Failed to publish measure command');
+                }
             })
             .then(response => {
                 if (!response.ok) {
@@ -288,7 +349,6 @@
                 console.log('Received data:', data);
                 if (data.status === 'success' && data.processed_data) {
                     updateMoistureDisplay(data.processed_data);
-                    updateIrrigationTime(new Date().toLocaleString());
                 } else {
                     console.error('Unexpected data structure:', data);
                 }
@@ -297,60 +357,6 @@
                 console.error('Error:', error);
             });
         });
-
-        // Update irrigation time display
-        function updateIrrigationTime(time) {
-            const [date, timeValue] = time.split(' ');
-            document.getElementById('irrigationDate').value = date;
-            document.getElementById('irrigationTime').value = timeValue;
-        }
-
-        // Get location and weather when the page loads
-        window.addEventListener('load', getLocation);
-
-        // Set a placeholder irrigation time (replace with actual logic later)
-        updateIrrigationTime('2023-05-01 09:00 AM');
-
-        let cropData = null;
-
-        async function loadCropData() {
-            try {
-                const response = await fetch('/static/crop_data.json');
-                cropData = await response.json();
-                console.log('Crop data loaded:', cropData);
-            } catch (error) {
-                console.error('Error loading crop data:', error);
-            }
-        }
-
-        function displayCropInfo(cropType) {
-            const cropInfo = document.getElementById('cropInfo');
-            if (cropData && cropData[cropType]) {
-                const crop = cropData[cropType];
-                cropInfo.innerHTML = `
-                    <h4>${crop.name}</h4>
-                    <img src="${crop.image}" alt="${crop.name}" style="max-width: 100%; height: auto;">
-                    <p>${crop.description}</p>
-                    <p><strong>Duration:</strong> ${crop.duration}</p>
-                    <p><strong>Nutrition Requirements:</strong></p>
-                    <ul>
-                        <li>Nitrogen: ${crop.nutrition.nitrogen}</li>
-                        <li>Phosphorus: ${crop.nutrition.phosphorus}</li>
-                        <li>Potassium: ${crop.nutrition.potassium}</li>
-                    </ul>
-                    <p><strong>Harvest Period:</strong> ${crop.harvestPeriod}</p>
-                    <p><strong>Recommended Weather:</strong> ${crop.recommendedWeather}</p>
-                `;
-            } else {
-                cropInfo.innerHTML = '<p>Select a crop type to view information.</p>';
-            }
-        }
-
-        document.getElementById('cropType').addEventListener('change', (event) => {
-            displayCropInfo(event.target.value);
-        });
-
-        window.addEventListener('load', loadCropData);
 
         document.addEventListener('DOMContentLoaded', function() {
             const cropSelect = document.getElementById('cropType');
@@ -384,13 +390,16 @@
             } else {
                 console.error('Crop select element not found');
             }
+
+            // Initialize moisture display with default values
+            initializeMoistureDisplay();
         });
 
         function updateCropInfo(cropData) {
             try {
                 const cropImage = document.getElementById('cropImage');
                 if (cropImage) {
-                    cropImage.src = cropData.image;
+                    cropImage.src = cropData.image || '/static/images/default-crop.jpg';
                     cropImage.onerror = function() {
                         console.warn('Failed to load crop image, using default');
                         this.src = '/static/images/default-crop.jpg';
@@ -399,14 +408,15 @@
                     console.error('Crop image element not found');
                 }
                 
-                updateElementText('cropName', cropData.name);
-                updateElementText('cropDescription', cropData.description);
-                updateElementText('cropRegions', `Regions: ${cropData.regions}`);
-                updateElementText('cropYield', `Expected Yield: ${cropData.expectedYield}`);
-                updateElementText('cropDuration', cropData.duration);
-                updateElementText('cropNutrients', cropData.nutrients);
-                updateElementText('cropWeather', cropData.weather);
-                updateElementText('cropETRate', cropData.etRate);
+                updateElementText('cropName', cropData.name || 'N/A');
+                updateElementText('cropDescription', cropData.description || 'No description available.');
+                updateElementText('cropRegions', `Regions: ${cropData.regions || 'N/A'}`);
+                updateElementText('cropYield', `Expected Yield: ${cropData.expectedYield || 'N/A'}`);
+                updateElementText('cropNPK', `Optimal N-P-K: ${cropData.npk || 'N/A'}`);
+                updateElementText('cropDuration', cropData.duration || 'N/A');
+                updateElementText('cropNutrients', cropData.nutrients || 'N/A');
+                updateElementText('cropWeather', cropData.weather || 'N/A');
+                updateElementText('cropETRate', cropData.etRate || 'N/A');
                 
                 console.log('Crop info updated successfully');
             } catch (error) {
@@ -423,20 +433,8 @@
             }
         }
 
-        document.getElementById('measureBtn').addEventListener('click', function() {
-            const now = new Date();
-            const formattedTime = now.toLocaleString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric', 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit' 
-            });
-            document.getElementById('lastMeasurementTime').value = formattedTime;
-            
-            // Your existing measurement code here
-        });
+        // Get location and weather when the page loads
+        window.addEventListener('load', getLocation);
 
         // Test function to check if JavaScript is running
         console.log('Crop info script loaded');
